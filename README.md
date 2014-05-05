@@ -1,4 +1,5 @@
-= Patches for dvbstreamer =
+Patches for dvbstreamer
+=======================
 
 dvbstreamer: http://sourceforge.net/projects/dvbstreamer/
 dvbstreamer wiki: http://sourceforge.net/apps/mediawiki/dvbstreamer/index.php?title=Main_Page
