@@ -1,0 +1,77 @@
+--- dvbstreamer-2.1.0.orig/src/main.c	2011-02-01 17:27:25.000000000 +0000
++++ dvbstreamer-2.1.0/src/main.c	2014-06-01 13:33:17.808849552 +0100
+@@ -36,6 +36,8 @@
+ #include <readline/readline.h>
+ #include <readline/history.h>
+ 
++#include <errno.h>
++
+ 
+ #include "parsezap.h"
+ #include "dbase.h"
+@@ -265,6 +267,24 @@
+             }
+             free(cwd);
+         }
++        /*
++         * set the pidfile up BEFORE forking
++         * so it is available in all children
++         */
++        FILE *pfp;
++        sprintf(PidFile, "/var/run/dvbstreamer-%d.pid", adapterNumber);
++        pfp = fopen(PidFile, "wt");
++        if (!pfp)
++        {
++            sprintf(PidFile, "%s/dvbstreamer-%d.pid", DataDirectory, adapterNumber);
++            pfp = fopen(PidFile, "wt");
++        }
++        if (pfp)
++        {
++            fclose(pfp);
++        }
++        /* end of pid file setup */
++
+         InitDaemon(adapterNumber);
+     }
+ 
+@@ -831,6 +851,7 @@
+     if (pid > 0)
+     {
+         FILE *fp;
++        /*
+         sprintf(PidFile, "/var/run/dvbstreamer-%d.pid", adapter);
+         fp = fopen(PidFile, "wt");
+         if (!fp)
+@@ -838,11 +859,14 @@
+             sprintf(PidFile, "%s/dvbstreamer-%d.pid", DataDirectory, adapter);
+             fp = fopen(PidFile, "wt");
+         }
+-
++        */
++        fp = fopen(PidFile, "wt");
+         if (fp)
+         {
+             fprintf(fp, "%d", pid);
+             fclose(fp);
++        }else{
++            LogModule(LOG_DEBUG, MAIN, "Failed to open pidfile: %s", PidFile);
+         }
+         exit(0);
+     }
+@@ -852,9 +876,15 @@
+ 
+ static void DeInitDaemon(void)
+ {
++    int ul;
++    char *se;
+ 
+     /* Remove pid file */
+-    unlink(PidFile);
++    ul=unlink(PidFile);
++    if(ul!=0){
++        se=strerror(errno);
++        LogModule(LOG_DEBUG, MAIN, "failed to delete pid file, %s, 'cos: %s",PidFile, se);
++    }
+     exit(0);
+ }
+ 
