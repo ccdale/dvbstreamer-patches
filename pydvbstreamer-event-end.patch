@@ -1,0 +1,11 @@
+--- connection.py	2010-04-09 16:59:40.000000000 +0100
++++ /home/chris/tmp/connection.py	2015-07-28 03:19:27.330774299 +0100
+@@ -156,7 +156,7 @@
+             
+         elif name == 'new':
+             new_start = time.strptime(attrs.getValue('start'), '%Y-%m-%d %H:%M:%S')
+-            new_end = time.strptime(attrs.getValue('start'), '%Y-%m-%d %H:%M:%S')
++            new_end = time.strptime(attrs.getValue('end'), '%Y-%m-%d %H:%M:%S')
+             new_ca = attrs.getValue('ca') == 'yes'
+             
+             self.handler.new_event(self.event_ref, new_start, new_end, new_ca)
